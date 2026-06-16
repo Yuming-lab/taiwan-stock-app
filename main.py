@@ -1,10 +1,29 @@
 import os
-from fastapi import FastAPI, Form, Request
+import secrets
+from fastapi import Depends, FastAPI, Form, HTTPException, Request, status
 from fastapi.responses import HTMLResponse
+from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from fastapi.templating import Jinja2Templates
 import yfinance as yf
 
-app = FastAPI()
+_security = HTTPBasic()
+_APP_PASSWORD = os.environ.get("APP_PASSWORD", "1234")
+
+
+def verify_password(credentials: HTTPBasicCredentials = Depends(_security)):
+    # secrets.compare_digest prevents timing attacks
+    password_ok = secrets.compare_digest(
+        credentials.password.encode(), _APP_PASSWORD.encode()
+    )
+    if not password_ok:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="パスワードが正しくありません",
+            headers={"WWW-Authenticate": "Basic"},
+        )
+
+
+app = FastAPI(dependencies=[Depends(verify_password)])
 
 # Absolute path so Vercel's Lambda can locate templates regardless of cwd
 _BASE_DIR = os.path.dirname(os.path.abspath(__file__))
