@@ -1,0 +1,36 @@
+<div class="mt-6 space-y-4">
+  <div class="bg-white rounded-2xl border-2 border-gray-200 p-6 shadow-sm">
+    <p class="text-2xl text-gray-500 mb-1">{{ symbol }} — {{ name }}</p>
+
+    <div class="flex flex-col gap-4 mt-4">
+      <div class="flex justify-between items-center border-b pb-4">
+        <span class="text-3xl text-gray-600">現價</span>
+        <span class="text-4xl font-bold text-gray-900">NT${{ price }}</span>
+      </div>
+
+      <div class="flex justify-between items-center border-b pb-4">
+        <span class="text-3xl text-gray-600">本益比 (P/E)</span>
+        <span class="text-3xl font-semibold text-gray-900">{{ pe }}</span>
+      </div>
+
+      <div class="flex justify-between items-center border-b pb-4">
+        <span class="text-3xl text-gray-600">最新季 EPS</span>
+        {% if eps %}
+        <span class="text-3xl font-semibold text-orange-700">{{ eps }} 元</span>
+        {% else %}
+        <span class="text-3xl text-gray-400">資料不足</span>
+        {% endif %}
+      </div>
+
+      <div class="flex justify-between items-center border-b pb-4">
+        <span class="text-3xl text-gray-600">殖利率</span>
+        <span class="text-3xl font-semibold text-blue-700">{{ dy_pct }}%</span>
+      </div>
+
+      <div class="flex justify-between items-center pt-2">
+        <span class="text-3xl text-gray-600">股價位階</span>
+        <span class="text-3xl font-bold px-6 py-3 rounded-2xl {{ badge_class }}">{{ badge_label }}</span>
+      </div>
+    </div>
+  </div>
+</div>

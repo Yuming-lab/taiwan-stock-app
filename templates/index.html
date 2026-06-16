@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>台股防守計算機</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+  <style>
+    button, input, select { min-height: 56px; }
+    .htmx-indicator { display: none; }
+    .htmx-request .htmx-indicator { display: block; }
+    .htmx-request.htmx-indicator { display: block; }
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+
+  <!-- Header -->
+  <header class="bg-white border-b-4 border-blue-600 px-6 py-8 text-center shadow-sm">
+    <h1 class="text-5xl font-bold text-gray-900">台股防守計算機</h1>
+    <p class="text-2xl text-gray-500 mt-3">您的股票估價 &amp; 存股 &amp; 停利助手</p>
+  </header>
+
+  <main class="max-w-5xl mx-auto px-4 py-8 space-y-8">
+
+    <!-- ===== Row 1: Cards 1 & 2 side-by-side on iPad/desktop ===== -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+      <!-- Card 1: 位階與估值檢查 -->
+      <section class="bg-white rounded-3xl shadow-md border border-gray-200 overflow-hidden flex flex-col">
+        <div class="bg-blue-600 px-6 py-5">
+          <h2 class="text-4xl font-bold text-white">📊 位階與估值檢查</h2>
+          <p class="text-xl text-blue-100 mt-1">現價、本益比、EPS、估價位階</p>
+        </div>
+
+        <div class="p-6 flex-1 flex flex-col">
+          <form
+            hx-post="/stock-check"
+            hx-target="#stock-result"
+            hx-swap="innerHTML"
+            hx-indicator="#stock-loading"
+            class="flex flex-col flex-1"
+          >
+            <label class="block text-3xl font-semibold text-gray-700 mb-3">股票代號</label>
+            <input
+              type="text"
+              name="stock_code"
+              placeholder="例：2330"
+              required
+              class="w-full text-4xl h-20 px-5 rounded-2xl border-2 border-gray-300 focus:border-blue-500 focus:outline-none bg-gray-50"
+            />
+            <button
+              type="submit"
+              class="mt-5 w-full text-3xl font-bold py-6 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white rounded-2xl transition-colors duration-150 shadow-sm"
+            >
+              查詢股票
+            </button>
+          </form>
+
+          <div id="stock-loading" class="htmx-indicator text-center mt-6">
+            <p class="text-3xl text-gray-500 animate-pulse">⏳ 查詢中，請稍候…</p>
+          </div>
+          <div id="stock-result"></div>
+        </div>
+      </section>
+
+      <!-- Card 2: 存股配息計算機 -->
+      <section class="bg-white rounded-3xl shadow-md border border-gray-200 overflow-hidden flex flex-col">
+        <div class="bg-green-600 px-6 py-5">
+          <h2 class="text-4xl font-bold text-white">💰 存股配息計算機</h2>
+          <p class="text-xl text-green-100 mt-1">殖利率、年配息、月均收入</p>
+        </div>
+
+        <div class="p-6 flex-1 flex flex-col">
+          <form
+            hx-post="/dividend-calc"
+            hx-target="#dividend-result"
+            hx-swap="innerHTML"
+            hx-indicator="#dividend-loading"
+            class="flex flex-col flex-1"
+          >
+            <div class="mb-5">
+              <label class="block text-3xl font-semibold text-gray-700 mb-3">股票代號</label>
+              <input
+                type="text"
+                name="stock_code"
+                placeholder="例：2330"
+                required
+                class="w-full text-4xl h-20 px-5 rounded-2xl border-2 border-gray-300 focus:border-green-500 focus:outline-none bg-gray-50"
+              />
+            </div>
+
+            <div class="mb-5">
+              <label class="block text-3xl font-semibold text-gray-700 mb-3">持股張數（1張＝1,000股）</label>
+              <input
+                type="number"
+                name="shares_zhang"
+                placeholder="例：10"
+                min="0.1"
+                step="0.1"
+                required
+                class="w-full text-4xl h-20 px-5 rounded-2xl border-2 border-gray-300 focus:border-green-500 focus:outline-none bg-gray-50"
+              />
+            </div>
+
+            <div class="mb-5">
+              <label class="block text-3xl font-semibold text-gray-700 mb-3">每股買進成本（元）</label>
+              <input
+                type="number"
+                name="cost_per_share"
+                placeholder="例：500"
+                min="1"
+                step="0.1"
+                required
+                class="w-full text-4xl h-20 px-5 rounded-2xl border-2 border-gray-300 focus:border-green-500 focus:outline-none bg-gray-50"
+              />
+            </div>
+
+            <button
+              type="submit"
+              class="w-full text-3xl font-bold py-6 bg-green-600 hover:bg-green-700 active:bg-green-800 text-white rounded-2xl transition-colors duration-150 shadow-sm mt-auto"
+            >
+              計算配息
+            </button>
+          </form>
+
+          <div id="dividend-loading" class="htmx-indicator text-center mt-6">
+            <p class="text-3xl text-gray-500 animate-pulse">⏳ 計算中，請稍候…</p>
+          </div>
+          <div id="dividend-result"></div>
+        </div>
+      </section>
+
+    </div><!-- end grid -->
+
+    <!-- ===== Card 3: 短線停利/出場計算機 (full width) ===== -->
+    <section class="bg-white rounded-3xl shadow-md border border-gray-200 overflow-hidden">
+      <div class="bg-orange-500 px-6 py-5">
+        <h2 class="text-4xl font-bold text-white">🎯 短線停利／出場計算機</h2>
+        <p class="text-xl text-orange-100 mt-1">設定目標獲利 %，立刻算出出場價格</p>
+      </div>
+
+      <div class="p-6">
+        <form
+          hx-post="/profit-calc"
+          hx-target="#profit-result"
+          hx-swap="innerHTML"
+          hx-indicator="#profit-loading"
+        >
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div>
+              <label class="block text-3xl font-semibold text-gray-700 mb-3">股票代號</label>
+              <input
+                type="text"
+                name="stock_code"
+                placeholder="例：2330"
+                required
+                class="w-full text-4xl h-20 px-5 rounded-2xl border-2 border-gray-300 focus:border-orange-500 focus:outline-none bg-gray-50"
+              />
+            </div>
+
+            <div>
+              <label class="block text-3xl font-semibold text-gray-700 mb-3">買進價格（元）</label>
+              <input
+                type="number"
+                name="buy_price"
+                placeholder="例：1000"
+                min="1"
+                step="0.1"
+                required
+                class="w-full text-4xl h-20 px-5 rounded-2xl border-2 border-gray-300 focus:border-orange-500 focus:outline-none bg-gray-50"
+              />
+            </div>
+
+            <div>
+              <label class="block text-3xl font-semibold text-gray-700 mb-3">目標獲利 %</label>
+              <input
+                type="number"
+                name="target_pct"
+                value="5"
+                min="0.5"
+                max="100"
+                step="0.5"
+                required
+                class="w-full text-4xl h-20 px-5 rounded-2xl border-2 border-gray-300 focus:border-orange-500 focus:outline-none bg-gray-50"
+              />
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            class="mt-6 w-full text-3xl font-bold py-6 bg-orange-500 hover:bg-orange-600 active:bg-orange-700 text-white rounded-2xl transition-colors duration-150 shadow-sm"
+          >
+            計算停利出場價
+          </button>
+        </form>
+
+        <div id="profit-loading" class="htmx-indicator text-center mt-6">
+          <p class="text-3xl text-gray-500 animate-pulse">⏳ 計算中，請稍候…</p>
+        </div>
+        <div id="profit-result"></div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="text-center text-xl text-gray-400 pb-8">
+      <p>資料來源：Yahoo Finance｜僅供參考，不構成投資建議</p>
+    </footer>
+
+  </main>
+</body>
+</html>

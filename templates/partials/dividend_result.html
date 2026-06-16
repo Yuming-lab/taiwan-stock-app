@@ -1,0 +1,33 @@
+<div class="mt-6 space-y-4">
+  <div class="bg-white rounded-2xl border-2 border-gray-200 p-6 shadow-sm">
+    <p class="text-2xl text-gray-500 mb-4">{{ symbol }} — {{ name }}（{{ shares_zhang }} 張 / {{ total_shares }} 股）</p>
+
+    <div class="flex flex-col gap-4">
+      <div class="flex justify-between items-center border-b pb-4">
+        <span class="text-3xl text-gray-600">預估總投資額</span>
+        <span class="text-3xl font-semibold text-gray-900">NT${{ total_investment }}</span>
+      </div>
+
+      <div class="flex justify-between items-center border-b pb-4">
+        <span class="text-3xl text-gray-600">您的實際殖利率</span>
+        <span class="text-3xl font-bold text-green-700">{{ actual_yield }}%</span>
+      </div>
+
+      <div class="flex justify-between items-center border-b pb-4">
+        <span class="text-3xl text-gray-600">預估每年可領股利</span>
+        <span class="text-4xl font-bold text-blue-700">NT${{ annual_dividend }}</span>
+      </div>
+
+      <div class="flex justify-between items-center border-b pb-4">
+        <span class="text-3xl text-gray-600">等同每月加薪</span>
+        <span class="text-4xl font-bold text-purple-700">NT${{ monthly_equiv }}</span>
+      </div>
+    </div>
+
+    <div class="mt-6 bg-blue-50 rounded-2xl p-6 border border-blue-200">
+      <p class="text-3xl font-bold text-blue-800 text-center">
+        💰 比銀行定存 {{ bank_rate }}% 高出 <span class="text-4xl text-blue-900">{{ multiplier }} 倍</span>！
+      </p>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,47 @@
+<div class="mt-6 space-y-4">
+  <div class="bg-white rounded-2xl border-2 border-gray-200 p-6 shadow-sm">
+    <p class="text-2xl text-gray-500 mb-4">{{ symbol }} — {{ name }}（買進 NT${{ buy_price }}，目標 +{{ target_pct }}%）</p>
+
+    <div class="flex flex-col gap-4">
+      <div class="flex justify-between items-center border-b pb-4">
+        <span class="text-3xl text-gray-600">買進價格</span>
+        <span class="text-3xl font-semibold text-gray-900">NT${{ buy_price }}</span>
+      </div>
+
+      <div class="flex justify-between items-center border-b pb-4">
+        <span class="text-3xl text-gray-600">🎯 目標出場價</span>
+        <span class="text-5xl font-bold text-green-700">NT${{ target_price }}</span>
+      </div>
+
+      <div class="flex justify-between items-center border-b pb-4">
+        <span class="text-3xl text-gray-600">每股預期獲利</span>
+        <span class="text-4xl font-bold text-green-600">+NT${{ profit_per_share }}</span>
+      </div>
+
+      {% if current_price %}
+      <div class="flex justify-between items-center border-b pb-4">
+        <span class="text-3xl text-gray-600">目前股價</span>
+        <span class="text-3xl font-semibold text-gray-900">NT${{ current_price }}</span>
+      </div>
+
+      <div class="flex justify-between items-center pb-2">
+        <span class="text-3xl text-gray-600">距目標還差</span>
+        {% if already_reached %}
+        <span class="text-3xl font-bold text-red-600">已超過目標價 ✅</span>
+        {% else %}
+        <span class="text-3xl font-bold text-blue-700">還需漲 {{ gap_pct }}%</span>
+        {% endif %}
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Giant alert banner -->
+  <div class="bg-green-500 rounded-2xl p-6 shadow-md">
+    <p class="text-3xl font-bold text-white text-center leading-relaxed">
+      📈 當股價到達<br>
+      <span class="text-5xl font-black">NT${{ target_price }}</span><br>
+      元時，請記得果斷賣出入袋為安！
+    </p>
+  </div>
+</div>
