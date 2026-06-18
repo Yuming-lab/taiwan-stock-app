@@ -39,12 +39,19 @@ def normalize_symbol(code: str) -> str:
     return code
 
 
-def fetch_info(symbol: str) -> dict:
-    ticker = yf.Ticker(symbol)
-    info = ticker.info
-    if not info.get("regularMarketPrice") and not info.get("currentPrice"):
-        raise ValueError(f"找不到股票代號 {symbol} 的資料")
-    return info
+def fetch_info(symbol: str) -> tuple[str, dict]:
+    """Try symbol as-is; if .TW yields no data, retry as .TWO (TPEX-listed stocks).
+    Returns (resolved_symbol, info)."""
+    candidates = [symbol]
+    if symbol.endswith(".TW"):
+        candidates.append(symbol[:-3] + ".TWO")
+
+    for candidate in candidates:
+        info = yf.Ticker(candidate).info
+        if info.get("regularMarketPrice") or info.get("currentPrice"):
+            return candidate, info
+
+    raise ValueError(f"找不到股票代號 {symbol} 的資料")
 
 
 @app.get("/", response_class=HTMLResponse)
@@ -56,7 +63,7 @@ async def index(request: Request):
 async def stock_check(request: Request, stock_code: str = Form(...)):
     symbol = normalize_symbol(stock_code)
     try:
-        info = fetch_info(symbol)
+        symbol, info = fetch_info(symbol)
 
         price = info.get("currentPrice") or info.get("regularMarketPrice")
         pe = info.get("trailingPE")
@@ -116,7 +123,7 @@ async def dividend_calc(
 ):
     symbol = normalize_symbol(stock_code)
     try:
-        info = fetch_info(symbol)
+        symbol, info = fetch_info(symbol)
 
         name = info.get("longName") or info.get("shortName") or symbol
         dividend_rate = info.get("dividendRate") or info.get("trailingAnnualDividendRate")
@@ -172,7 +179,7 @@ async def profit_calc(
     gap_pct = None
     already_reached = False
     try:
-        info = fetch_info(symbol)
+        symbol, info = fetch_info(symbol)
         current_price = info.get("currentPrice") or info.get("regularMarketPrice")
         name = info.get("longName") or info.get("shortName") or symbol
         if current_price:
